@@ -16,9 +16,13 @@ Assumption made: Customers can only have one email, as this will be the email th
 
 ## Schema Design
 Customer(*CustomerID*, First Name, Last Name, Email, StreetAddress, City, State, ZipCode)
+
 Purchase(*OrderNumber*, CustomerID, ProductID, Date)
+
 Product(*ProductID*, Name, Quantity, Price)
+
 Updates(*UID*, ProductID, StaffID, Date)
+
 Staff(*StaffID*, Name, Position)
 
 ## Database Implementation Instructions
