@@ -1,7 +1,9 @@
 # E-commerce-DB-Final-Project
 This is the repository for my Database Fundamentals final project. Within this readme file I have included all subsequent deliverables for the project in order to meet the assignment criteria.
-I created a simple e-commerce platform that stores product data, customer data, and staff data. This platform allows customers to buy products and allows staff to update products.
+
+I created a simple e-commerce platform that stores product data, customer data, and staff data. This platform allows customers to buy products and allows staff to update products. This platform was created in Python, and uses MySQL for database management.
 ## Requirements Gathering 
+Below are the use cases created for this specific project, and the subsequent data requirement created by the Use Case.
 | Use Cases | Data Requirements |
 | ----------- | ----------- |
 | User must be able to purchase item | Must include relationship between Customer and Product entities |
@@ -16,6 +18,8 @@ Assumption made: Customers can only have one email, as this will be the email th
 
 ## Schema Design
 Customer(*CustomerID*, First Name, Last Name, Email, StreetAddress, City, State, ZipCode)
+
+CreditCard(*CardNum*, CustomerID, SecurityCode, Expdate)
 
 Purchase(*OrderNumber*, CustomerID, ProductID, Date)
 
