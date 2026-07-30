@@ -1,9 +1,7 @@
 # Main Menu Code
-
 from decimal import Decimal, InvalidOperation
-
 from database import get_connection
-
+from datetime import date
 
 def view_products():
     connection = get_connection()
@@ -229,16 +227,193 @@ def add_customer():
         cursor.close()
         connection.close()
 
+def view_purchases():
+    connection = get_connection()
+
+    if connection is None:
+        return
+
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT
+                Purchase.OrderNumber,
+                Customer.FirstName,
+                Customer.LastName,
+                Product.Name,
+                Purchase.QuantityPurchased,
+                Product.Price,
+                Purchase.QuantityPurchased * Product.Price AS LineTotal,
+                Purchase.PurchaseDate
+            FROM Purchase
+            JOIN Customer
+                ON Purchase.CustomerID = Customer.CustomerID
+            JOIN Product
+                ON Purchase.ProductID = Product.ProductID
+            ORDER BY Purchase.OrderNumber, Product.Name
+        """)
+
+        purchases = cursor.fetchall()
+
+        if not purchases:
+            print("\nNo purchases found.")
+            return
+
+        print("\nPurchase History")
+        print("-" * 110)
+        print(
+            f"{'Order':<10}"
+            f"{'Customer':<25}"
+            f"{'Product':<25}"
+            f"{'Qty':<8}"
+            f"{'Price':<12}"
+            f"{'Total':<12}"
+            f"{'Date':<12}"
+        )
+        print("-" * 110)
+
+        for (
+            order_number,
+            first_name,
+            last_name,
+            product_name,
+            quantity,
+            price,
+            line_total,
+            purchase_date
+        ) in purchases:
+            customer_name = f"{first_name} {last_name}"
+
+            print(
+                f"{order_number:<10}"
+                f"{customer_name:<25}"
+                f"{product_name:<25}"
+                f"{quantity:<8}"
+                f"${price:<11.2f}"
+                f"${line_total:<11.2f}"
+                f"{str(purchase_date):<12}"
+            )
+
+    except Exception as error:
+        print(f"Could not retrieve purchases: {error}")
+
+    finally:
+        cursor.close()
+        connection.close()
+
+def record_purchase():
+    try:
+        order_number = int(input("Enter order number: "))
+        customer_id = int(input("Enter customer ID: "))
+        product_id = int(input("Enter product ID: "))
+        quantity = int(input("Enter quantity purchased: "))
+    except ValueError:
+        print("Order number, IDs, and quantity must be whole numbers.")
+        return
+
+    if quantity <= 0:
+        print("Quantity must be greater than zero.")
+        return
+
+    connection = get_connection()
+
+    if connection is None:
+        return
+
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            SELECT CustomerID
+            FROM Customer
+            WHERE CustomerID = %s
+            """,
+            (customer_id,)
+        )
+
+        if cursor.fetchone() is None:
+            print("Customer not found.")
+            return
+
+        cursor.execute(
+            """
+            SELECT StockQuantity
+            FROM Product
+            WHERE ProductID = %s
+            FOR UPDATE
+            """,
+            (product_id,)
+        )
+
+        product = cursor.fetchone()
+
+        if product is None:
+            print("Product not found.")
+            return
+
+        current_stock = product[0]
+
+        if current_stock < quantity:
+            print(
+                f"Not enough inventory. "
+                f"Only {current_stock} unit(s) are available."
+            )
+            return
+
+        cursor.execute(
+            """
+            INSERT INTO Purchase (
+                OrderNumber,
+                ProductID,
+                CustomerID,
+                PurchaseDate,
+                QuantityPurchased
+            )
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (
+                order_number,
+                product_id,
+                customer_id,
+                date.today(),
+                quantity
+            )
+        )
+
+        cursor.execute(
+            """
+            UPDATE Product
+            SET StockQuantity = StockQuantity - %s
+            WHERE ProductID = %s
+            """,
+            (quantity, product_id)
+        )
+
+        connection.commit()
+        print("Purchase recorded successfully.")
+
+    except Exception as error:
+        connection.rollback()
+        print(f"Could not record purchase: {error}")
+
+    finally:
+        cursor.close()
+        connection.close()
+
 
 def display_menu():
-    print("\n==========================")
-    print("    Mini Online Store")
-    print("==========================")
+    print("\n======================================")
+    print("    Div's Mini Online Store Viewer")
+    print("======================================")
     print("1. View products")
     print("2. Add product")
     print("3. View customers")
     print("4. Add customer")
-    print("5. Exit")
+    print("5. View purchases")
+    print("6. Record purchase")
+    print("7. Exit")
 
 
 def main():
@@ -259,11 +434,16 @@ def main():
             add_customer()
 
         elif choice == "5":
+            view_purchases()
+
+        elif choice == "6":
+            record_purchase()
+
+        elif choice == "7":
             print("Goodbye! Thank you for visiting.")
             break
-
         else:
-            print("Invalid option. Enter a number from 1 through 5.")
+            print("Invalid option. Enter a number from 1 through 7.")
 
 
 if __name__ == "__main__":
