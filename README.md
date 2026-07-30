@@ -21,7 +21,7 @@ Customer(*CustomerID*, First Name, Last Name, Email, StreetAddress, City, State,
 
 CreditCard(*CardNum*, CustomerID, SecurityCode, Expdate)
 
-Purchase(*OrderNumber*, CustomerID, ProductID, Date)
+Purchase(*OrderNumber, ProductID*, CustomerID, Date)
 
 Product(*ProductID*, Name, Quantity, Price)
 
