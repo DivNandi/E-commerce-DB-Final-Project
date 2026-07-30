@@ -1,3 +1,4 @@
+# Establishes MySQL Connection
 import mysql.connector
 
 def get_connection():
