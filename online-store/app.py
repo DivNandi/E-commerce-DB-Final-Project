@@ -1,4 +1,4 @@
-# Main Menu Code
+# Main Menu Code + Python to SQL implementation 
 from decimal import Decimal, InvalidOperation
 from database import get_connection
 from datetime import date
@@ -402,6 +402,194 @@ def record_purchase():
         cursor.close()
         connection.close()
 
+def view_staff():
+    connection = get_connection()
+
+    if connection is None:
+        return
+
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT StaffID, Name, Position
+            FROM Staff
+            ORDER BY StaffID
+        """)
+
+        staff_members = cursor.fetchall()
+
+        if not staff_members:
+            print("\nNo staff members found.")
+            return
+
+        print("\nStaff")
+        print("-" * 60)
+        print(f"{'ID':<8}{'Name':<25}{'Position':<25}")
+        print("-" * 60)
+
+        for staff_id, name, position in staff_members:
+            print(
+                f"{staff_id:<8}"
+                f"{name:<25}"
+                f"{position:<25}"
+            )
+
+    except Exception as error:
+        print(f"Could not retrieve staff: {error}")
+
+    finally:
+        cursor.close()
+        connection.close()
+
+def view_updates():
+    connection = get_connection()
+
+    if connection is None:
+        return
+
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT
+                Updates.UID,
+                Staff.Name,
+                Staff.Position,
+                Product.Name,
+                Updates.UpdateDate
+            FROM Updates
+            JOIN Staff
+                ON Updates.StaffID = Staff.StaffID
+            JOIN Product
+                ON Updates.ProductID = Product.ProductID
+            ORDER BY Updates.UpdateDate, Updates.UID
+        """)
+
+        updates = cursor.fetchall()
+
+        if not updates:
+            print("\nNo product updates found.")
+            return
+
+        print("\nProduct Update History")
+        print("-" * 100)
+        print(
+            f"{'UID':<8}"
+            f"{'Staff':<25}"
+            f"{'Position':<25}"
+            f"{'Product':<25}"
+            f"{'Date':<12}"
+        )
+        print("-" * 100)
+
+        for uid, staff_name, position, product_name, update_date in updates:
+            print(
+                f"{uid:<8}"
+                f"{staff_name:<25}"
+                f"{position:<25}"
+                f"{product_name:<25}"
+                f"{str(update_date):<12}"
+            )
+
+    except Exception as error:
+        print(f"Could not retrieve product updates: {error}")
+
+    finally:
+        cursor.close()
+        connection.close()
+
+def record_product_update():
+    try:
+        staff_id = int(input("Enter staff ID: "))
+        product_id = int(input("Enter product ID: "))
+        new_stock_quantity = int(input("Enter new stock quantity: "))
+    except ValueError:
+        print("Staff ID, product ID, and stock must be whole numbers.")
+        return
+
+    if new_stock_quantity < 0:
+        print("Stock quantity cannot be negative.")
+        return
+
+    connection = get_connection()
+
+    if connection is None:
+        return
+
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            SELECT StaffID
+            FROM Staff
+            WHERE StaffID = %s
+            """,
+            (staff_id,)
+        )
+
+        if cursor.fetchone() is None:
+            print("Staff member not found.")
+            return
+
+        cursor.execute(
+            """
+            SELECT ProductID, Name, StockQuantity
+            FROM Product
+            WHERE ProductID = %s
+            FOR UPDATE
+            """,
+            (product_id,)
+        )
+
+        product = cursor.fetchone()
+
+        if product is None:
+            print("Product not found.")
+            return
+
+        _, product_name, old_stock_quantity = product
+
+        cursor.execute(
+            """
+            UPDATE Product
+            SET StockQuantity = %s
+            WHERE ProductID = %s
+            """,
+            (new_stock_quantity, product_id)
+        )
+
+        cursor.execute(
+            """
+            INSERT INTO Updates (
+                ProductID,
+                StaffID,
+                UpdateDate
+            )
+            VALUES (%s, %s, %s)
+            """,
+            (
+                product_id,
+                staff_id,
+                date.today()
+            )
+        )
+
+        connection.commit()
+
+        print("\nProduct updated successfully.")
+        print(f"Product: {product_name}")
+        print(f"Old stock: {old_stock_quantity}")
+        print(f"New stock: {new_stock_quantity}")
+
+    except Exception as error:
+        connection.rollback()
+        print(f"Could not update product: {error}")
+
+    finally:
+        cursor.close()
+        connection.close()
 
 def display_menu():
     print("\n======================================")
@@ -413,7 +601,10 @@ def display_menu():
     print("4. Add customer")
     print("5. View purchases")
     print("6. Record purchase")
-    print("7. Exit")
+    print("7. View staff")
+    print("8. View product updates")
+    print("9. Record product update")
+    print("10. Exit")
 
 
 def main():
@@ -440,10 +631,20 @@ def main():
             record_purchase()
 
         elif choice == "7":
+            view_staff()
+
+        elif choice == "8":
+            view_updates()
+
+        elif choice == "9":
+            record_product_update()
+
+        elif choice == "10":
             print("Goodbye! Thank you for visiting.")
             break
+
         else:
-            print("Invalid option. Enter a number from 1 through 7.")
+            print("Invalid option. Enter a number from 1 through 10.")
 
 
 if __name__ == "__main__":
