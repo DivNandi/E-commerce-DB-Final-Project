@@ -14,14 +14,14 @@ Below are the use cases created for this specific project, and the subsequent da
 
 ## Entity Relationship Diagram
 <img width="1802" height="775" alt="image" src="https://github.com/user-attachments/assets/9aa27039-9f2d-4447-93a4-1335aa452641" />
-Assumption made: Customers can only have one email, as this will be the email they sign in with. 
+Assumption made: Customers can only have one email, as this will be the email they sign in with. Purchase should also include an attribute called "QuantitiesPurchased" 
 
 ## Schema Design
 Customer(*CustomerID*, First Name, Last Name, Email, StreetAddress, City, State, ZipCode)
 
 CreditCard(*CardNum*, CustomerID, SecurityCode, Expdate)
 
-Purchase(*OrderNumber, ProductID*, CustomerID, Date)
+Purchase(*OrderNumber, ProductID*, CustomerID, DatePurchased, QuantitiesPurchased)
 
 Product(*ProductID*, Name, Quantity, Price)
 
