@@ -38,6 +38,6 @@ Database Insertion: https://github.com/DivNandi/E-commerce-DB-Final-Project/blob
 ## Database Interaction
 Within my Repository is also links to the example SQL queries required for the project: https://github.com/DivNandi/E-commerce-DB-Final-Project/blob/main/online-store/queries.sql
 
-Lastly, here is a link to my database demonstration video: 
+Lastly, here is a link to my database demonstration video: https://drive.google.com/file/d/1-sW31QhZq55ZFLTNnVVa0isEFSmhesHe/view?usp=sharing 
 
 
