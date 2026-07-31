@@ -1,7 +1,7 @@
 # E-commerce-DB-Final-Project
 This is the repository for my Database Fundamentals final project. Within this readme file I have included all subsequent deliverables for the project in order to meet the assignment criteria.
 
-I created a simple e-commerce platform that stores product data, customer data, and staff data. This platform allows customers to buy products and allows staff to update products. This platform was created in Python, and uses MySQL for database management.
+I created a simple e-commerce platform that stores product data, customer data, and staff data. This platform allows staff to update products, and allows staff to update customer information. This platform is designed for a giant warehouse firm, so there is no direct customer input. This platform was created in Python, and uses MySQL as a backend for database management.
 ## Requirements Gathering 
 Below are the use cases created for this specific project, and the subsequent data requirement created by the Use Case.
 | Use Cases | Data Requirements |
@@ -29,9 +29,12 @@ Updates(*UID*, ProductID, StaffID, Date)
 
 Staff(*StaffID*, Name, Position)
 
-## Database Implementation Instructions
-
-
+## Database Implementation
+Within my Repository is the links to my database creation statements and my database data insertion statements 
+Database Creation: 
+https://github.com/DivNandi/E-commerce-DB-Final-Project/blob/main/online-store/schema.sql 
+Database Insertion: 
+https://github.com/DivNandi/E-commerce-DB-Final-Project/blob/main/online-store/sample_data.sql
 
 ## Database Interaction
 
