@@ -11,7 +11,6 @@ FROM Product
 WHERE StockQuantity > 0
 ORDER BY Name;
 
-
 -- Query 2:
 -- Show customers and their credit-card expiration dates.
 SELECT

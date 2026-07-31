@@ -190,6 +190,7 @@ def add_customer():
         return
 
     cursor = connection.cursor()
+    new_customer_id = None
 
     try:
         cursor.execute(
@@ -217,11 +218,72 @@ def add_customer():
         )
 
         connection.commit()
+
+        new_customer_id = cursor.lastrowid
+
         print("\nCustomer added successfully.")
+        print(f"Customer ID: {new_customer_id}")
 
     except Exception as error:
         connection.rollback()
         print(f"Could not add customer: {error}")
+
+    finally:
+        cursor.close()
+        connection.close()
+
+    if new_customer_id is not None:
+        choice = input(
+            "Would you like to add a credit card for this customer? (y/n): "
+        ).strip().lower()
+
+        if choice == "y":
+            add_credit_card(new_customer_id)
+
+        elif choice != "n":
+            print("Invalid choice. Credit card was not added.")
+
+def add_credit_card(customer_id):
+    card_num = input("Enter card number: ").strip()
+    security_code = input("Enter security code: ").strip()
+    exp_date = input("Enter expiration date (YYYY-MM-DD): ").strip()
+
+    if not card_num or not security_code or not exp_date:
+        print("All credit card fields are required.")
+        return
+
+    connection = get_connection()
+
+    if connection is None:
+        return
+
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            INSERT INTO CreditCard (
+                CardNum,
+                CustomerID,
+                SecurityCode,
+                ExpDate
+            )
+            VALUES (%s, %s, %s, %s)
+            """,
+            (
+                card_num,
+                customer_id,
+                security_code,
+                exp_date
+            )
+        )
+
+        connection.commit()
+        print("Credit card added successfully.")
+
+    except Exception as error:
+        connection.rollback()
+        print(f"Could not add credit card: {error}")
 
     finally:
         cursor.close()
