@@ -30,13 +30,14 @@ Updates(*UID*, ProductID, StaffID, Date)
 Staff(*StaffID*, Name, Position)
 
 ## Database Implementation
-Within my Repository is the links to my database creation statements and my database data insertion statements 
-Database Creation: 
-https://github.com/DivNandi/E-commerce-DB-Final-Project/blob/main/online-store/schema.sql 
-Database Insertion: 
-https://github.com/DivNandi/E-commerce-DB-Final-Project/blob/main/online-store/sample_data.sql
+Within my Repository is the links to my database creation statements and my database data insertion statements.
+
+Database Creation: https://github.com/DivNandi/E-commerce-DB-Final-Project/blob/main/online-store/schema.sql 
+Database Insertion: https://github.com/DivNandi/E-commerce-DB-Final-Project/blob/main/online-store/sample_data.sql
 
 ## Database Interaction
+Within my Repository is also links to the example SQL queries required for the project: https://github.com/DivNandi/E-commerce-DB-Final-Project/blob/main/online-store/queries.sql
 
+Lastly, here is a link to my database demonstration video: 
 
 
